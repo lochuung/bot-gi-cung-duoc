@@ -109,9 +109,9 @@ public
 .pnp.*
 
 # Build outputs
-dist/
-build/
-lib/
+dist
+build
+lib
 *.js
 *.js.map
 *.d.ts
