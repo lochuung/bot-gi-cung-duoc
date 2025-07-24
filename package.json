@@ -1,0 +1,23 @@
+{
+  "name": "mezon-eatery",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/lochuung/MezonEatery#readme",
+  "bugs": {
+    "url": "https://github.com/lochuung/MezonEatery/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lochuung/MezonEatery.git"
+  },
+  "license": "ISC",
+  "author": "Nguyen Huu Loc",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "mezon-sdk": "^2.8.0"
+  }
+}
