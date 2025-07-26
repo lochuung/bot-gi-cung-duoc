@@ -1,11 +1,26 @@
 {
   "compilerOptions": {
-    "target": "ES6", // Phiên bản JS đầu ra
-    "module": "commonjs", // Loại module
-    "outDir": "./dist", // Thư mục chứa mã biên dịch
-    "rootDir": "./src", // Thư mục chứa mã nguồn
-    "strict": true, // Bật chế độ kiểm tra nghiêm ngặt
-    "esModuleInterop": true, // Cho phép import theo kiểu ES module
-    "forceConsistentCasingInFileNames": true
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@app/*": [
+        "./src/*"
+      ]
+    }
   }
 }

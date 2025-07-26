@@ -1,0 +1,22 @@
+import { DataSource, DataSourceOptions } from "typeorm";
+
+import config from "@app/config/env.config";
+
+export const dataSourceOption: DataSourceOptions = {
+    name: "default",
+    host: config().POSTGRES_HOST,
+    port: +(config().POSTGRES_PORT ?? 5432),
+    username: config().POSTGRES_USER,
+    password: config().POSTGRES_PASSWORD,
+    database: config().POSTGRES_DB,
+    synchronize: true,
+    logging: true,
+    entities: ["dist/entities/*.entity.js"],
+    migrations: ["dist/migrations/*.js"],
+    subscribers: [],
+    schema: "public",
+    migrationsRun: true,
+    type: 'postgres',
+};
+
+export default new DataSource(dataSourceOption);
