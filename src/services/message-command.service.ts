@@ -1,64 +1,55 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Interval } from '@nestjs/schedule';
 import { MezonClient } from 'mezon-sdk';
 import { AsyncThrottleQueue } from 'mezon-sdk/dist/cjs/mezon-client/utils/AsyncThrottleQueue';
 import { MessageQueue } from './message-queue.service';
 import { MezonClientService } from './mezon-client.service';
+import { APP_CONSTANTS, ERROR_MESSAGES } from '@app/common/constants';
 
 @Injectable()
-export class MessageCommand {
+export class MessageCommand implements OnModuleDestroy {
     private readonly logger = new Logger(MessageCommand.name);
     private readonly client: MezonClient;
-    private readonly throttleQueue = new AsyncThrottleQueue(45);
+    private readonly throttleQueue = new AsyncThrottleQueue(APP_CONSTANTS.MESSAGE_PROCESSING.THROTTLE_LIMIT);
+    private isProcessing = false;
 
     constructor(
         private readonly messageQueue: MessageQueue,
         private readonly clientService: MezonClientService,
     ) {
         this.client = this.clientService.getClient();
-        this.startMessageProcessing();
     }
 
-    private startMessageProcessing(): void {
-        setInterval(() => this.processMessages(), 50);
+    onModuleDestroy() {
+        this.isProcessing = false;
     }
 
+    @Interval(APP_CONSTANTS.MESSAGE_PROCESSING.INTERVAL_MS)
     private processMessages(): void {
-        while (this.messageQueue.hasMessages() && this.throttleQueue) {
-            const message = this.messageQueue.getNextMessage();
-            if (!message) break;
+        if (this.isProcessing) return;
 
-            this.throttleQueue.enqueue(() => this.handleMessage(message));
+        this.isProcessing = true;
+        try {
+            while (this.messageQueue.hasMessages() && this.throttleQueue) {
+                const message = this.messageQueue.getNextMessage();
+                if (!message) break;
+
+                this.throttleQueue.enqueue(() => this.handleMessage(message));
+            }
+        } finally {
+            this.isProcessing = false;
         }
     }
 
     private async handleMessage(message: any): Promise<void> {
         try {
             if (message.userId) {
-                await this.sendDirectMessage(message);
+                await this.clientService.sendMessageToUser(message);
             } else {
                 await this.clientService.sendMessage(message);
             }
         } catch (error) {
-            this.logger.error('Error handling message:', error);
-        }
-    }
-
-    private async sendDirectMessage(message: any): Promise<void> {
-        try {
-            const dmClan = await this.client.clans.fetch('0');
-            const user = await dmClan.users.fetch(message.userId);
-
-            if (!user) return;
-
-            await user.sendDM(
-                {
-                    t: message?.textContent ?? '',
-                    ...(message?.messOptions ?? {}),
-                },
-                message?.code,
-            );
-        } catch (error) {
-            this.logger.error('Error sending direct message:', error);
+            this.logger.error(ERROR_MESSAGES.MESSAGE_HANDLING, error);
         }
     }
 }

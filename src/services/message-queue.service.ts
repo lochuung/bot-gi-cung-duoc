@@ -1,5 +1,7 @@
+import { Injectable } from '@nestjs/common';
 import { ReplyMezonMessage } from "@app/dtos/MezonReplyMessageDto";
 
+@Injectable()
 export class MessageQueue {
     private queue: ReplyMezonMessage[] = [];
 

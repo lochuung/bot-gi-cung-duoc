@@ -1,85 +1,216 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Mezon Eatery Bot
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A modern, scalable chat bot built with NestJS and TypeScript for the Mezon chat platform.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Features
 
-## Description
+- **Modern Architecture**: Built with NestJS framework using TypeScript
+- **Command System**: Extensible command system with metadata support
+- **Event-Driven**: Event-driven architecture with proper separation of concerns
+- **Database Integration**: PostgreSQL with TypeORM for data persistence
+- **Message Queue**: Efficient message processing with throttling
+- **Error Handling**: Comprehensive error handling and logging
+- **Modular Design**: Clean, maintainable, and testable code structure
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 📋 Prerequisites
 
-## Project setup
+- Node.js 18+ 
+- PostgreSQL 12+
+- pnpm (recommended) or npm
+
+## 🔧 Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/lochuung/MezonEatery.git
+   cd MezonEatery
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pnpm install
+   ```
+
+3. **Environment Setup**
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Configure your environment variables:
+   ```env
+   POSTGRES_HOST=localhost
+   POSTGRES_PORT=5432
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=your_password
+   POSTGRES_DB=eatery
+   MEZON_TOKEN=your_mezon_bot_token
+   ```
+
+4. **Database Setup**
+   ```bash
+   # Run migrations
+   pnpm run db:run
+   ```
+
+## 🚀 Running the Application
 
 ```bash
-$ pnpm install
+# Development mode
+pnpm run start:dev
+
+# Production mode
+pnpm run start:prod
+
+# Debug mode
+pnpm run start:debug
 ```
 
-## Compile and run the project
+## 🤖 Available Commands
+
+| Command | Description | Usage |
+|---------|-------------|-------|
+| `!help` | Show available commands | `!help [command]` |
+| `!ping` | Check bot latency | `!ping` |
+| `!about` | Bot information | `!about` |
+
+## 🏗️ Project Structure
+
+```
+src/
+├── command/           # Bot commands
+│   ├── common/       # Command abstractions
+│   ├── help.command.ts
+│   ├── ping.command.ts
+│   └── about.command.ts
+├── common/           # Shared constants and utilities
+├── config/           # Configuration files
+├── decorators/       # Custom decorators
+├── dtos/            # Data transfer objects
+├── entities/        # Database entities
+├── gateway/         # Event gateways
+├── listeners/       # Event listeners
+├── modules/         # NestJS modules
+├── services/        # Business logic services
+├── types/           # TypeScript type definitions
+└── utils/           # Utility functions
+```
+
+## 🧪 Testing
 
 ```bash
-# development
-$ pnpm run start
+# Unit tests
+pnpm run test
 
-# watch mode
-$ pnpm run start:dev
+# End-to-end tests
+pnpm run test:e2e
 
-# production mode
-$ pnpm run start:prod
+# Test coverage
+pnpm run test:cov
 ```
 
-## Run tests
+## 📊 Database
+
+The bot uses PostgreSQL with TypeORM for data persistence. Key entities:
+
+- **User**: Mezon user information
+- **CommandUsage**: Command usage analytics
+- **MessageLog**: Message processing logs
+
+## 🔧 Development
+
+### Adding New Commands
+
+1. Create a new command file in `src/command/`
+2. Extend `CommandMessage` class
+3. Use `@Command` decorator with metadata
+4. Register in `BotModule`
+
+Example:
+```typescript
+@Command('example', {
+    description: 'An example command',
+    usage: '!example [args]',
+    category: 'Utility',
+})
+export class ExampleCommand extends CommandMessage {
+    execute(args: string[], message: ChannelMessage) {
+        return this.replyMessageGenerate({ 
+            messageContent: 'Hello World!' 
+        }, message);
+    }
+}
+```
+
+### Code Quality
 
 ```bash
-# unit tests
-$ pnpm run test
+# Lint code
+pnpm run lint
 
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+# Format code
+pnpm run format
 ```
 
-## Resources
+## 📚 Architecture
 
-Check out a few resources that may come in handy when working with NestJS:
+### Core Components
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- **BotGateway**: Handles Mezon SDK events
+- **MessageCommand**: Processes message queue with throttling
+- **CommandService**: Routes commands to handlers
+- **MessageQueue**: Manages message processing queue
 
-## Support
+### Design Patterns
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- **Command Pattern**: For bot commands
+- **Observer Pattern**: For event handling
+- **Dependency Injection**: Via NestJS
+- **Repository Pattern**: With TypeORM
 
-## Stay in touch
+## 🚀 Deployment
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Docker (Recommended)
 
-## License
+```bash
+# Build image
+docker build -t mezon-eatery .
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+# Run container
+docker run -d --name mezon-eatery \
+  --env-file .env.production \
+  -p 3000:3000 \
+  mezon-eatery
+```
+
+### Manual Deployment
+
+```bash
+# Build application
+pnpm run build
+
+# Run production
+NODE_ENV=production pnpm run start:prod
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the ISC License.
+
+## 👤 Author
+
+**Nguyen Huu Loc**
+- GitHub: [@lochuung](https://github.com/lochuung)
+
+## 🙏 Acknowledgments
+
+- Built with [NestJS](https://nestjs.com/)
+- Powered by [Mezon SDK](https://github.com/nccasia/mezon-sdk)
+- Database with [TypeORM](https://typeorm.io/)

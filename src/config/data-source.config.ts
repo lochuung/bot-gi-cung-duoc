@@ -1,9 +1,9 @@
 import { DataSource, DataSourceOptions } from "typeorm";
-
 import config from "@app/config/env.config";
 
 export const dataSourceOption: DataSourceOptions = {
     name: "default",
+    type: 'postgres',
     host: config().POSTGRES_HOST,
     port: +(config().POSTGRES_PORT ?? 5432),
     username: config().POSTGRES_USER,
@@ -16,7 +16,6 @@ export const dataSourceOption: DataSourceOptions = {
     subscribers: [],
     schema: "public",
     migrationsRun: true,
-    type: 'postgres',
 };
 
 export default new DataSource(dataSourceOption);
