@@ -10,7 +10,9 @@ export class HelpCommand extends CommandMessage {
     }
 
     execute(args: string[], message: ChannelMessage) {
-        const messageContent = `Available commands: ${Object.keys(CommandStorage.getAllCommands()).join(', ')}`;
+        const messageContent =
+            `Available commands: !${Array.from(CommandStorage.getAllCommands().keys()).join(', !')}\n` +
+            `Use !command_name for more information about a specific command.`;
         return this.replyMessageGenerate(
             {
                 messageContent,
