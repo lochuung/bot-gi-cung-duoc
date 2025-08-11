@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Dish, DishFilterOptions, DishSearchResult } from '@app/types/dish.types';
 import { DishEntity } from '@app/entities/dish.entity';
 import { AngiConfig } from '@app/config/angi.config';
+import { fisherYatesShuffle } from '@app/utils/common';
 
 @Injectable()
 export class DishService {
@@ -87,8 +88,8 @@ export class DishService {
         if (filteredDishes.length === AngiConfig.EMPTY_TOTAL) {
             return { picked: null, suggestions: [], total: AngiConfig.EMPTY_TOTAL };
         }
-
-        const shuffled = filteredDishes.sort(() => Math.random() - 0.5);
+        
+        const shuffled = fisherYatesShuffle(filteredDishes);
         const picked = shuffled[0];
         const suggestions = shuffled.slice(1, 1 + AngiConfig.MAX_SUGGESTIONS);
 
