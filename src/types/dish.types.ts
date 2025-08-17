@@ -1,4 +1,4 @@
-export interface Dish {
+export interface DishDto {
     name: string;
     province: string;
     region: string;
@@ -11,7 +11,7 @@ export interface DishFilterOptions {
 }
 
 export interface DishSearchResult {
-    picked: Dish | null;
-    suggestions: Dish[];
+    picked: DishDto | null;
+    suggestions: DishDto[];
     total: number;
 }
