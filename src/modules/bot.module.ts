@@ -3,8 +3,6 @@ import { PingCommand } from '@app/command/ping.command';
 import { AboutCommand } from '@app/command/about.command';
 import { AnGiCommand } from '@app/command/angi.command';
 import { MenuCommand } from '@app/command/menu.command';
-import { ImportDishesCommand } from '@app/command/import-dishes.command';
-import { StatsCommand } from '@app/command/stats.command';
 import { ClientConfigService } from '@app/config/client.config';
 import { BotGateway } from '@app/gateway/bot.gateway';
 import { EventListenerChannelMessage } from '@app/listeners';
