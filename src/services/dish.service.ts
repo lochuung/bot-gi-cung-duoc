@@ -1,18 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Dish, DishFilterOptions, DishSearchResult } from '@app/types/dish.types';
-import { DishEntity } from '@app/entities/dish.entity';
+import { In, Repository } from 'typeorm';
+import { DishDto, DishFilterOptions, DishSearchResult } from '@app/types/dish.types';
+import { Dish } from '@app/entities/dish.entity';
 import { AngiConfig } from '@app/config/angi.config';
 import { fisherYatesShuffle } from '@app/utils/common';
+import { RedisService } from '@app/services/redis.service';
 
 @Injectable()
 export class DishService {
-    private fallbackDishes: Dish[] = AngiConfig.FALLBACK_DISHES;
+    private fallbackDishes: DishDto[] = AngiConfig.FALLBACK_DISHES;
 
     constructor(
-        @InjectRepository(DishEntity)
-        private readonly dishRepository: Repository<DishEntity>,
+        @InjectRepository(Dish)
+        private readonly dishRepository: Repository<Dish>,
+        private readonly redisService: RedisService,
     ) { }
 
     private normalizeText(text: string): string {
@@ -23,7 +25,7 @@ export class DishService {
             .trim();
     }
 
-    async findRandomDish(filters?: DishFilterOptions): Promise<DishSearchResult> {
+    async findRandomDish(filters?: DishFilterOptions, username?: string): Promise<DishSearchResult> {
         try {
             const qb = this.dishRepository.createQueryBuilder('dishes');
 
@@ -39,17 +41,46 @@ export class DishService {
                 });
             }
 
-            const rows = await qb
+            // Get recent dishes for user to avoid duplicates
+            let excludeDishIds: number[] = [];
+            if (username) {
+                excludeDishIds = await this.getRecentDishIds(username);
+                if (excludeDishIds.length > 0) {
+                    qb.andWhere('dishes.id NOT IN (:...excludeIds)', { excludeIds: excludeDishIds });
+                }
+            }
+
+            let rows = await qb
                 .orderBy('RANDOM()')
                 .limit(AngiConfig.MAX_RANDOM_DISHES)
                 .getMany();
 
+            // If no dishes found with exclusions, try without exclusions
+            if (rows.length === 0 && excludeDishIds.length > 0) {
+                rows = await this.dishRepository.createQueryBuilder('dishes')
+                    .where(filters?.region ? `unaccent(dishes.region) ILIKE unaccent(:region)` : '1=1', {
+                        region: `%${filters?.region}%`,
+                    })
+                    .andWhere(filters?.category ? `unaccent(dishes.category) ILIKE unaccent(:category)` : '1=1', {
+                        category: `%${filters?.category}%`,
+                    })
+                    .orderBy('RANDOM()')
+                    .limit(AngiConfig.MAX_RANDOM_DISHES)
+                    .getMany();
+            }
+
             if (rows.length === AngiConfig.EMPTY_TOTAL) {
                 console.log('Database empty, using fallback data');
-                return this.findRandomDishFromArray(this.fallbackDishes, filters);
+                return this.findRandomDishFromArray(this.fallbackDishes, filters, username);
             }
 
             const [picked, ...rest] = rows;
+
+            // Save the picked dish for this user to avoid repeating
+            if (username && picked && 'id' in picked) {
+                await this.saveRecentDish(username, picked.id);
+            }
+
             return {
                 picked,
                 suggestions: rest.slice(0, AngiConfig.MAX_SUGGESTIONS),
@@ -57,13 +88,14 @@ export class DishService {
             };
         } catch (error) {
             console.error('Error finding random dish from database, using fallback:', error);
-            return this.findRandomDishFromArray(this.fallbackDishes, filters);
+            return this.findRandomDishFromArray(this.fallbackDishes, filters, username);
         }
     }
 
     private findRandomDishFromArray(
-        dishes: Dish[],
+        dishes: DishDto[],
         filters?: DishFilterOptions,
+        username?: string,
     ): DishSearchResult {
         let filteredDishes = [...dishes];
 
@@ -88,7 +120,7 @@ export class DishService {
         if (filteredDishes.length === AngiConfig.EMPTY_TOTAL) {
             return { picked: null, suggestions: [], total: AngiConfig.EMPTY_TOTAL };
         }
-        
+
         const shuffled = fisherYatesShuffle(filteredDishes);
         const picked = shuffled[0];
         const suggestions = shuffled.slice(1, 1 + AngiConfig.MAX_SUGGESTIONS);
@@ -168,6 +200,187 @@ export class DishService {
         } catch (error) {
             console.error('Error getting available categories, using fallback:', error);
             return [...new Set(this.fallbackDishes.map(dish => dish.category))];
+        }
+    }
+
+    /**
+     * Get recent dish IDs for a user to avoid duplicates
+     */
+    private async getRecentDishIds(username: string): Promise<number[]> {
+        try {
+            const key = `recent_dishes:${username}`;
+            const recentDishes = await this.redisService.get<number[]>(key);
+            return recentDishes || [];
+        } catch (error) {
+            console.error('Error getting recent dishes from Redis:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Save a dish ID as recently suggested for a user
+     */
+    private async saveRecentDish(username: string, dishId: number): Promise<void> {
+        try {
+            const key = `recent_dishes:${username}`;
+            let recentDishes = await this.redisService.get<number[]>(key) || [];
+
+            // Add new dish to the beginning
+            recentDishes.unshift(dishId);
+
+            // Keep only the most recent dishes
+            recentDishes = recentDishes.slice(0, AngiConfig.MAX_RECENT_DISHES);
+
+            // Save back to Redis with TTL
+            await this.redisService.set(key, recentDishes, AngiConfig.RECENT_DISHES_TTL);
+        } catch (error) {
+            console.error('Error saving recent dish to Redis:', error);
+        }
+    }
+
+    /**
+     * Clear recent dishes for a user
+     */
+    async clearRecentDishes(username: string): Promise<void> {
+        try {
+            const key = `recent_dishes:${username}`;
+            await this.redisService.del(key);
+        } catch (error) {
+            console.error('Error clearing recent dishes from Redis:', error);
+        }
+    }
+
+    /**
+     * Get dish statistics
+     */
+    async getDishStatistics(): Promise<{
+        totalDishes: number;
+        dishesPerRegion: Record<string, number>;
+        dishesPerCategory: Record<string, number>;
+    }> {
+        try {
+            const [total, regionStats, categoryStats] = await Promise.all([
+                this.dishRepository.count(),
+                this.dishRepository
+                    .createQueryBuilder('dishes')
+                    .select('dishes.region', 'region')
+                    .addSelect('COUNT(*)', 'count')
+                    .groupBy('dishes.region')
+                    .getRawMany(),
+                this.dishRepository
+                    .createQueryBuilder('dishes')
+                    .select('dishes.category', 'category')
+                    .addSelect('COUNT(*)', 'count')
+                    .groupBy('dishes.category')
+                    .getRawMany(),
+            ]);
+
+            const dishesPerRegion: Record<string, number> = {};
+            const dishesPerCategory: Record<string, number> = {};
+
+            regionStats.forEach(stat => {
+                dishesPerRegion[stat.region] = parseInt(stat.count);
+            });
+
+            categoryStats.forEach(stat => {
+                dishesPerCategory[stat.category] = parseInt(stat.count);
+            });
+
+            return {
+                totalDishes: total,
+                dishesPerRegion,
+                dishesPerCategory,
+            };
+        } catch (error) {
+            console.error('Error getting dish statistics:', error);
+            return {
+                totalDishes: this.fallbackDishes.length,
+                dishesPerRegion: {},
+                dishesPerCategory: {},
+            };
+        }
+    }
+
+    /**
+     * Create a new dish
+     */
+    async createDish(dishData: Omit<DishDto, 'id' | 'createdAt' | 'updatedAt'>): Promise<Dish> {
+        try {
+            const dish = this.dishRepository.create(dishData);
+            return await this.dishRepository.save(dish);
+        } catch (error) {
+            console.error('Error creating dish:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Update a dish
+     */
+    async updateDish(id: number, dishData: Partial<Omit<DishDto, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Dish | null> {
+        try {
+            await this.dishRepository.update(id, dishData);
+            return await this.dishRepository.findOne({ where: { id } });
+        } catch (error) {
+            console.error('Error updating dish:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Delete a dish
+     */
+    async deleteDish(id: number): Promise<boolean> {
+        try {
+            const result = await this.dishRepository.delete(id);
+            return result.affected > 0;
+        } catch (error) {
+            console.error('Error deleting dish:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Find dish by ID
+     */
+    async findDishById(id: number): Promise<Dish | null> {
+        try {
+            return await this.dishRepository.findOne({ where: { id } });
+        } catch (error) {
+            console.error('Error finding dish by ID:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Search dishes by name
+     */
+    async searchDishes(searchTerm: string, limit: number = 10): Promise<Dish[]> {
+        try {
+            return await this.dishRepository
+                .createQueryBuilder('dishes')
+                .where('unaccent(dishes.name) ILIKE unaccent(:searchTerm)', {
+                    searchTerm: `%${searchTerm}%`,
+                })
+                .limit(limit)
+                .getMany();
+        } catch (error) {
+            console.error('Error searching dishes:', error);
+            return [];
+        }
+    }
+
+    async getRecentDishesForUser(username: string): Promise<Dish[]> {
+        try {
+            const key = `recent_dishes:${username}`;
+            const recentDishes = await this.redisService.get(key);
+            const dishIds = Array.isArray(recentDishes) ? recentDishes : [];
+            return await this.dishRepository.findBy({
+                id: In(dishIds),
+            });
+        } catch (error) {
+            console.error('Error getting recent dishes for user:', error);
+            return [];
         }
     }
 }

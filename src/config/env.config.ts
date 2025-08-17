@@ -12,4 +12,7 @@ export default () => ({
     POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD || "",
     POSTGRES_DB: process.env.POSTGRES_DB || "",
     MEZON_TOKEN: process.env.MEZON_TOKEN || "",
+    REDIS_HOST: process.env.REDIS_HOST || "localhost",
+    REDIS_PORT: process.env.REDIS_PORT || 6379,
+    REDIS_PASSWORD: process.env.REDIS_PASSWORD || "",
 });

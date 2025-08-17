@@ -16,7 +16,7 @@ export class AnGiCommand extends CommandMessage {
 
     async execute(args: string[], message: ChannelMessage) {
         const filters = this.dishService.parseFilters(args);
-        const result = await this.dishService.findRandomDish(filters);
+        const result = await this.dishService.findRandomDish(filters, message.username);
 
         if (!result.picked) {
             let errorMessage = '😔 Không tìm thấy món ăn nào';

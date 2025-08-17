@@ -31,4 +31,6 @@ export const AngiConfig = {
     'vặt',
     'uống',
   ],
+  RECENT_DISHES_TTL: 24 * 60 * 60, // 24 hours
+  MAX_RECENT_DISHES: 10,// Maximum recent dishes to track
 };
