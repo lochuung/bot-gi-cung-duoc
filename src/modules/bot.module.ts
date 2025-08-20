@@ -5,6 +5,7 @@ import { AnGiCommand } from '@app/command/angi.command';
 import { MenuCommand } from '@app/command/menu.command';
 import { DishAdminCommand } from '@app/command/dish-admin.command';
 import { UserStatsCommand } from '@app/command/user-stats.command';
+import { GiDayCommand } from '@app/command/giday.command';
 import { ClientConfigService } from '@app/config/client.config';
 import { BotGateway } from '@app/gateway/bot.gateway';
 import { EventListenerChannelMessage } from '@app/listeners';
@@ -14,6 +15,7 @@ import { MessageQueue } from '@app/services/message-queue.service';
 import { DishService } from '@app/services/dish.service';
 import { UserService } from '@app/services/user.service';
 import { RedisService } from '@app/services/redis.service';
+import { GiDayService } from '@app/services/giday.service';
 import { DishActionHandlers } from '@app/command/handlers/dish-action.handlers';
 import { DishActionDispatcher } from '@app/command/services/dish-action-dispatcher.service';
 import { Module } from '@nestjs/common';
@@ -39,6 +41,7 @@ import { TestCommand } from '@app/command/test.command';
         DishService,
         UserService,
         RedisService,
+        GiDayService,
 
         // Command Services & Handlers
         DishActionHandlers,
@@ -55,7 +58,8 @@ import { TestCommand } from '@app/command/test.command';
         MenuCommand,
         TestCommand,
         DishAdminCommand,
-        UserStatsCommand
+        UserStatsCommand,
+        GiDayCommand
     ],
     controllers: [],
 })
