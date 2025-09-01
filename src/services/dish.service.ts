@@ -6,7 +6,7 @@ import { Dish } from '@app/entities/dish.entity';
 import { AngiConfig } from '@app/config/angi.config';
 import { fisherYatesShuffle } from '@app/utils/common';
 import { RedisService } from '@app/services/redis.service';
-import { ANGI_MESSAGES } from '@app/command/constants/angi.messages';
+import { ANGI_MESSAGES } from '@app/messages/angi.messages';
 
 @Injectable()
 export class DishService {

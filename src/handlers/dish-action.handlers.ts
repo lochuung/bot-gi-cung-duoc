@@ -1,9 +1,9 @@
 import { ChannelMessage } from 'mezon-sdk';
 import { Injectable } from '@nestjs/common';
 import { DishService } from '@app/services/dish.service';
-import { DISH_ADMIN_CONSTANTS, DishField } from '@app/command/constants/dish-admin.constants';
-import { DISH_ADMIN_MESSAGES } from '@app/command/constants/dish-admin.messages';
-import { DishValidationUtils } from '@app/command/utils/dish-validation.utils';
+import { DISH_ADMIN_CONSTANTS, DishField } from '@app/constants/dish-admin.constants';
+import { DISH_ADMIN_MESSAGES } from '@app/messages/dish-admin.messages';
+import { DishValidationUtils } from '@app/utils/dish-validation.utils';
 
 export interface ActionHandlerResponse {
     messageContent: string;

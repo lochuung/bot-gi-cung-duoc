@@ -1,5 +1,5 @@
-import { DISH_ADMIN_CONSTANTS, DishField } from '@app/command/constants/dish-admin.constants';
-import { DISH_ADMIN_MESSAGES } from '@app/command/constants/dish-admin.messages';
+import { DISH_ADMIN_CONSTANTS, DishField } from '@app/constants/dish-admin.constants';
+import { DISH_ADMIN_MESSAGES } from '@app/messages/dish-admin.messages';
 
 export class DishValidationUtils {
     /**

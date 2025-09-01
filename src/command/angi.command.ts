@@ -2,8 +2,8 @@ import { ChannelMessage } from 'mezon-sdk';
 import { Command } from '@app/decorators/command.decorator';
 import { CommandMessage } from '@app/command/common/command.abstract';
 import { DishService } from '@app/services/dish.service';
-import { ANGI_MESSAGES } from '@app/command/constants/angi.messages';
-import { formatMessage, joinMessages } from '@app/command/utils/message-formatter.utils';
+import { ANGI_MESSAGES } from '@app/messages/angi.messages';
+import { formatMessage, joinMessages } from '@app/utils/message-formatter.utils';
 
 @Command('angi', {
     description: 'Gợi ý món ăn ngẫu nhiên (có thể lọc theo miền và phân loại)',

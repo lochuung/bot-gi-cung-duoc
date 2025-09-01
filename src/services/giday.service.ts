@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RedisService } from '@app/services/redis.service';
-import { GIDAY_MESSAGES } from '@app/command/constants/giday.messages';
-import { formatMessage } from '@app/command/utils/message-formatter.utils';
+import { GIDAY_MESSAGES } from '@app/messages/giday.messages';
+import { formatMessage } from '@app/utils/message-formatter.utils';
 
 export interface GiDayOption {
     value: string;

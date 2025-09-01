@@ -2,8 +2,8 @@ import { ChannelMessage } from 'mezon-sdk';
 import { Command } from '@app/decorators/command.decorator';
 import { CommandMessage } from '@app/command/common/command.abstract';
 import { GiDayService, GiDayRandomResult } from '@app/services/giday.service';
-import { GIDAY_MESSAGES } from '@app/command/constants/giday.messages';
-import { formatMessage, joinMessages, createNumberedList } from '@app/command/utils/message-formatter.utils';
+import { GIDAY_MESSAGES } from '@app/messages/giday.messages';
+import { formatMessage, joinMessages, createNumberedList } from '@app/utils/message-formatter.utils';
 
 @Command('giday', {
     description: 'Tạo danh sách lựa chọn và random một trong số đó',

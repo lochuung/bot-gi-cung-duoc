@@ -3,8 +3,8 @@ import { Command } from '@app/decorators/command.decorator';
 import { CommandMessage } from '@app/command/common/command.abstract';
 import { DishService } from '@app/services/dish.service';
 import { Dish } from '@app/entities/dish.entity';
-import { USER_STATS_MESSAGES } from '@app/command/constants/user-stats.messages';
-import { formatMessage } from '@app/command/utils/message-formatter.utils';
+import { USER_STATS_MESSAGES } from '@app/messages/user-stats.messages';
+import { formatMessage } from '@app/utils/message-formatter.utils';
 
 @Command('mystats', {
     description: 'Xem thống kê cá nhân về việc gợi ý món ăn',

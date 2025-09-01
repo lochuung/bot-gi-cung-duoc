@@ -2,8 +2,8 @@ import { ChannelMessage } from 'mezon-sdk';
 import { Command } from '@app/decorators/command.decorator';
 import { CommandMessage } from '@app/command/common/command.abstract';
 import { DishService } from '@app/services/dish.service';
-import { MENU_MESSAGES } from '@app/command/constants/menu.messages';
-import { formatMessage } from '@app/command/utils/message-formatter.utils';
+import { MENU_MESSAGES } from '@app/messages/menu.messages';
+import { formatMessage } from '@app/utils/message-formatter.utils';
 
 @Command('menu', {
     description: 'Hiển thị thông tin về các món ăn có sẵn',

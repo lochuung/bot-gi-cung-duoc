@@ -70,9 +70,9 @@ yarn typeorm migration:create src/migrations/YourMigrationName
 - Database services use TypeORM repositories
 
 ### Admin Authorization
-Use `@Admin()` decorator on command classes requiring admin privileges:
+Use `@IsAdmin()` decorator on command classes requiring admin privileges:
 ```typescript
-@Admin()
+@IsAdmin()
 @Command('dish-admin', { /* metadata */ })
 export class DishAdminCommand extends CommandMessage {
     // Only admins can execute
