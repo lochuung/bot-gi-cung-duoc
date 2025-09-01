@@ -3,6 +3,8 @@ import { Command } from '@app/decorators/command.decorator';
 import { CommandMessage } from '@app/command/common/command.abstract';
 import { DishService } from '@app/services/dish.service';
 import { Dish } from '@app/entities/dish.entity';
+import { USER_STATS_MESSAGES } from '@app/command/constants/user-stats.messages';
+import { formatMessage } from '@app/command/utils/message-formatter.utils';
 
 @Command('mystats', {
     description: 'Xem thống kê cá nhân về việc gợi ý món ăn',
@@ -21,28 +23,38 @@ export class UserStatsCommand extends CommandMessage {
             const recentDishes: Dish[] = await this.dishService.getRecentDishesForUser(message.username);
             
             const lines = [
-                `📊 **THỐNG KÊ CỦA ${message.username}**\n`,
-                `🍽️ **Món đã gợi ý gần đây:** ${recentDishes.length}/10`,
+                formatMessage(USER_STATS_MESSAGES.SUCCESS.HEADER, { username: message.username }),
+                '',
+                formatMessage(USER_STATS_MESSAGES.SUCCESS.RECENT_DISHES_COUNT, { count: recentDishes.length.toString() }),
             ];
 
             if (recentDishes.length > 0) {
-                lines.push('\n🕒 **Món ăn gần đây:**');
+                lines.push('');
+                lines.push(USER_STATS_MESSAGES.SUCCESS.RECENT_DISHES_HEADER);
                 for (let i = 0; i < Math.min(5, recentDishes.length); i++) {
                     const dish = recentDishes[i];
                     if (dish) {
-                        lines.push(`   ${i + 1}. ${dish.name} (${dish.province})`);
+                        lines.push(formatMessage(USER_STATS_MESSAGES.SUCCESS.DISH_ITEM, {
+                            index: (i + 1).toString(),
+                            name: dish.name,
+                            province: dish.province
+                        }));
                     }
                 }
                 
                 if (recentDishes.length > 5) {
-                    lines.push(`   ... và ${recentDishes.length - 5} món khác`);
+                    lines.push(formatMessage(USER_STATS_MESSAGES.SUCCESS.MORE_DISHES, {
+                        count: (recentDishes.length - 5).toString()
+                    }));
                 }
                 
-                lines.push('\n💡 *Các món này sẽ không được gợi ý lại trong 24h*');
-                lines.push('🧹 *Admin có thể xóa cache: `!dish clear-cache ' + message.username + '`*');
+                lines.push('');
+                lines.push(USER_STATS_MESSAGES.INFO.NO_CACHE_INFO);
+                lines.push(formatMessage(USER_STATS_MESSAGES.INFO.ADMIN_CLEAR_CACHE, { username: message.username }));
             } else {
-                lines.push('\n✨ **Chưa có món nào được gợi ý!**');
-                lines.push('💡 *Thử gõ `!angi` để được gợi ý món ăn*');
+                lines.push('');
+                lines.push(USER_STATS_MESSAGES.INFO.NO_DISHES_YET);
+                lines.push(USER_STATS_MESSAGES.INFO.TRY_ANGI_TIP);
             }
 
             return this.replyMessageGenerate(
@@ -53,10 +65,10 @@ export class UserStatsCommand extends CommandMessage {
                 message,
             );
         } catch (error) {
-            console.error('Error getting user stats:', error);
+            console.error(USER_STATS_MESSAGES.LOG.ERROR_GETTING_USER_STATS, error);
             return this.replyMessageGenerate(
                 {
-                    messageContent: '❌ **Lỗi khi lấy thống kê!** Vui lòng thử lại.',
+                    messageContent: USER_STATS_MESSAGES.ERROR.STATS_ERROR,
                     mk: true,
                 },
                 message,

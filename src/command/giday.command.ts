@@ -74,7 +74,7 @@ export class GiDayCommand extends CommandMessage {
         if (optionArgs.length === 0) {
             return this.replyMessageGenerate(
                 {
-                    messageContent: `❌ Vui lòng cung cấp nội dung lựa chọn!\n${GIDAY_MESSAGES.INFO.TIPS.ADD_MORE}`,
+                    messageContent: `${GIDAY_MESSAGES.ERROR.MISSING_OPTION_CONTENT}\n${GIDAY_MESSAGES.INFO.TIPS.ADD_MORE}`,
                     mk: true,
                 },
                 message,
@@ -96,18 +96,18 @@ export class GiDayCommand extends CommandMessage {
 
         const config = this.giDayService.getConfig();
         const lines: string[] = [];
-        lines.push('✅ **ĐÃ THÊM LỰA CHỌN**');
+        lines.push(GIDAY_MESSAGES.SUCCESS.OPTION_ADDED_HEADER);
         lines.push('');
-        lines.push(`➕ **Mới thêm:** ${option}`);
+        lines.push(formatMessage(GIDAY_MESSAGES.SUCCESS.OPTION_ADDED_NEW, { option }));
         lines.push(formatMessage(GIDAY_MESSAGES.INFO.OPTIONS_COUNT, { 
             current: result.newTotal!.toString(),
             max: config.maxOptions.toString()
         }));
         lines.push('');
-        lines.push('💡 **Tiếp theo:**');
-        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.ADD_MORE.replace('💡 ', '')}`);
-        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.RANDOM_NOW.replace('🎲 ', '')}`);
-        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.VIEW_LIST.replace('📋 ', '')}`);
+        lines.push(GIDAY_MESSAGES.INFO.NEXT_ACTIONS);
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.ADD_MORE_SIMPLE}`);
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.RANDOM_NOW_SIMPLE}`);
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.VIEW_LIST_SIMPLE}`);
 
         return this.replyMessageGenerate(
             {
@@ -132,17 +132,17 @@ export class GiDayCommand extends CommandMessage {
         }
 
         const lines: string[] = [];
-        lines.push('🎲 **KẾT QUẢ RANDOM**');
+        lines.push(GIDAY_MESSAGES.SUCCESS.RANDOM_RESULT_HEADER);
         lines.push('');
-        lines.push(`🎯 **Lựa chọn: ${result.result!.chosenOption}**`);
+        lines.push(formatMessage(GIDAY_MESSAGES.SUCCESS.RANDOM_CHOSEN, { option: result.result!.chosenOption }));
         lines.push('');
-        lines.push('📋 **Các lựa chọn ban đầu:**');
+        lines.push(GIDAY_MESSAGES.INFO.INITIAL_OPTIONS);
         result.result!.allOptions.forEach((option, index) => {
             const prefix = index === result.result!.chosenIndex ? '➡️' : '   •';
             lines.push(`${prefix} ${option}`);
         });
         lines.push('');
-        lines.push('🧹 *Danh sách đã được xóa sau khi random*');
+        lines.push(GIDAY_MESSAGES.SUCCESS.RANDOM_CLEARED_NOTE);
         
         return this.replyMessageGenerate(
             {
@@ -182,10 +182,10 @@ export class GiDayCommand extends CommandMessage {
             max: listResult.maxOptions.toString()
         }));
         lines.push('');
-        lines.push('💡 **Thao tác:**');
-        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.ADD_MORE.replace('💡 ', '')}`);
-        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.RANDOM_NOW.replace('🎲 ', '')}`);
-        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.CLEAR_ALL.replace('🧹 ', '')}`);
+        lines.push(GIDAY_MESSAGES.INFO.AVAILABLE_ACTIONS);
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.ADD_MORE_SIMPLE}`);
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.RANDOM_NOW_SIMPLE}`);
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.CLEAR_ALL_SIMPLE}`);
 
         return this.replyMessageGenerate(
             {
@@ -239,21 +239,21 @@ export class GiDayCommand extends CommandMessage {
     private showHelp(message: ChannelMessage) {
         const config = this.giDayService.getConfig();
         const lines: string[] = [];
-        lines.push('🎲 **HƯỚNG DẪN GIDAY**');
+        lines.push(GIDAY_MESSAGES.INFO.HELP_HEADER);
         lines.push('');
-        lines.push('📝 **Cách 1: Random trực tiếp**');
+        lines.push(GIDAY_MESSAGES.INFO.HELP_DIRECT_MODE);
         lines.push(`   ${GIDAY_MESSAGES.INFO.TIPS.DIRECT_MODE.replace('⚡ ', '')}`);
         lines.push('');
-        lines.push('📝 **Cách 2: Tạo danh sách từ từ**');
+        lines.push(GIDAY_MESSAGES.INFO.HELP_LIST_MODE);
         lines.push(`   ${GIDAY_MESSAGES.INFO.TIPS.ADD_MORE.replace('💡 ', '')}`);
-        lines.push('   `!giday add burger` - Thêm tiếp');
+        lines.push(`   ${GIDAY_MESSAGES.INFO.EXAMPLES.ADD_BURGER}`);
         lines.push(`   ${GIDAY_MESSAGES.INFO.TIPS.RANDOM_NOW.replace('🎲 ', '')}`);
         lines.push('');
-        lines.push('🔧 **Lệnh khác:**');
+        lines.push(GIDAY_MESSAGES.INFO.HELP_OTHER_COMMANDS);
         lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.VIEW_LIST.replace('📋 ', '')}`);
         lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.CLEAR_ALL.replace('🧹 ', '')}`);
         lines.push('');
-        lines.push(`⚠️ **Giới hạn:** Tối đa ${config.maxOptions} lựa chọn, tự động xóa sau 24h`);
+        lines.push(formatMessage(GIDAY_MESSAGES.INFO.HELP_LIMITATIONS, { maxOptions: config.maxOptions.toString() }));
 
         return this.replyMessageGenerate(
             {
@@ -266,11 +266,11 @@ export class GiDayCommand extends CommandMessage {
 
     private formatRandomResult(result: GiDayRandomResult, message: ChannelMessage) {
         const lines: string[] = [];
-        lines.push('🎲 **KẾT QUẢ RANDOM**');
+        lines.push(GIDAY_MESSAGES.SUCCESS.RANDOM_RESULT_HEADER);
         lines.push('');
-        lines.push(`🎯 **Lựa chọn: ${result.chosenOption}**`);
+        lines.push(formatMessage(GIDAY_MESSAGES.SUCCESS.RANDOM_CHOSEN, { option: result.chosenOption }));
         lines.push('');
-        lines.push('📋 **Các lựa chọn ban đầu:**');
+        lines.push(GIDAY_MESSAGES.INFO.INITIAL_OPTIONS);
         result.allOptions.forEach((option, index) => {
             const prefix = index === result.chosenIndex ? '➡️' : '   •';
             lines.push(`${prefix} ${option}`);

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DishActionHandlers, ActionHandlerResponse } from '@app/command/handlers/dish-action.handlers';
+import { DishActionHandlers, ActionHandlerResponse } from '@app/handlers/dish-action.handlers';
 import { DISH_ADMIN_MESSAGES } from '@app/command/constants/dish-admin.messages';
 
 export type DishActionType = 

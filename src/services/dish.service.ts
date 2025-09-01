@@ -6,6 +6,7 @@ import { Dish } from '@app/entities/dish.entity';
 import { AngiConfig } from '@app/config/angi.config';
 import { fisherYatesShuffle } from '@app/utils/common';
 import { RedisService } from '@app/services/redis.service';
+import { ANGI_MESSAGES } from '@app/command/constants/angi.messages';
 
 @Injectable()
 export class DishService {
@@ -70,7 +71,7 @@ export class DishService {
             }
 
             if (rows.length === AngiConfig.EMPTY_TOTAL) {
-                console.log('Database empty, using fallback data');
+                console.log(ANGI_MESSAGES.LOG.DATABASE_EMPTY_FALLBACK);
                 return this.findRandomDishFromArray(this.fallbackDishes, filters, username);
             }
 
@@ -87,7 +88,7 @@ export class DishService {
                 total: rows.length,
             };
         } catch (error) {
-            console.error('Error finding random dish from database, using fallback:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_FINDING_DISH, error);
             return this.findRandomDishFromArray(this.fallbackDishes, filters, username);
         }
     }
@@ -170,13 +171,13 @@ export class DishService {
                 .getRawMany();
 
             if (result.length === 0) {
-                console.log('Database empty, using fallback regions');
+                console.log(ANGI_MESSAGES.LOG.DATABASE_EMPTY_REGIONS);
                 return [...new Set(this.fallbackDishes.map(dish => dish.region))];
             }
 
             return result.map(item => item.region);
         } catch (error) {
-            console.error('Error getting available regions, using fallback:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_GETTING_REGIONS, error);
             return [...new Set(this.fallbackDishes.map(dish => dish.region))];
         }
     }
@@ -192,13 +193,13 @@ export class DishService {
                 .getRawMany();
 
             if (result.length === 0) {
-                console.log('Database empty, using fallback categories');
+                console.log(ANGI_MESSAGES.LOG.DATABASE_EMPTY_CATEGORIES);
                 return [...new Set(this.fallbackDishes.map(dish => dish.category))];
             }
 
             return result.map(item => item.category);
         } catch (error) {
-            console.error('Error getting available categories, using fallback:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_GETTING_CATEGORIES, error);
             return [...new Set(this.fallbackDishes.map(dish => dish.category))];
         }
     }
@@ -208,11 +209,11 @@ export class DishService {
      */
     private async getRecentDishIds(username: string): Promise<number[]> {
         try {
-            const key = `recent_dishes:${username}`;
+            const key = `${ANGI_MESSAGES.REDIS_KEYS.RECENT_DISHES_PREFIX}${username}`;
             const recentDishes = await this.redisService.get<number[]>(key);
             return recentDishes || [];
         } catch (error) {
-            console.error('Error getting recent dishes from Redis:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_GETTING_RECENT_DISHES, error);
             return [];
         }
     }
@@ -222,7 +223,7 @@ export class DishService {
      */
     private async saveRecentDish(username: string, dishId: number): Promise<void> {
         try {
-            const key = `recent_dishes:${username}`;
+            const key = `${ANGI_MESSAGES.REDIS_KEYS.RECENT_DISHES_PREFIX}${username}`;
             let recentDishes = await this.redisService.get<number[]>(key) || [];
 
             // Add new dish to the beginning
@@ -234,7 +235,7 @@ export class DishService {
             // Save back to Redis with TTL
             await this.redisService.set(key, recentDishes, AngiConfig.RECENT_DISHES_TTL);
         } catch (error) {
-            console.error('Error saving recent dish to Redis:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_SAVING_RECENT_DISH, error);
         }
     }
 
@@ -243,10 +244,10 @@ export class DishService {
      */
     async clearRecentDishes(username: string): Promise<void> {
         try {
-            const key = `recent_dishes:${username}`;
+            const key = `${ANGI_MESSAGES.REDIS_KEYS.RECENT_DISHES_PREFIX}${username}`;
             await this.redisService.del(key);
         } catch (error) {
-            console.error('Error clearing recent dishes from Redis:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_CLEARING_RECENT_DISHES, error);
         }
     }
 
@@ -292,7 +293,7 @@ export class DishService {
                 dishesPerCategory,
             };
         } catch (error) {
-            console.error('Error getting dish statistics:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_GETTING_STATISTICS, error);
             return {
                 totalDishes: this.fallbackDishes.length,
                 dishesPerRegion: {},
@@ -309,7 +310,7 @@ export class DishService {
             const dish = this.dishRepository.create(dishData);
             return await this.dishRepository.save(dish);
         } catch (error) {
-            console.error('Error creating dish:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_CREATING_DISH, error);
             throw error;
         }
     }
@@ -322,7 +323,7 @@ export class DishService {
             await this.dishRepository.update(id, dishData);
             return await this.dishRepository.findOne({ where: { id } });
         } catch (error) {
-            console.error('Error updating dish:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_UPDATING_DISH, error);
             throw error;
         }
     }
@@ -335,7 +336,7 @@ export class DishService {
             const result = await this.dishRepository.delete(id);
             return result.affected > 0;
         } catch (error) {
-            console.error('Error deleting dish:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_DELETING_DISH, error);
             throw error;
         }
     }
@@ -347,7 +348,7 @@ export class DishService {
         try {
             return await this.dishRepository.findOne({ where: { id } });
         } catch (error) {
-            console.error('Error finding dish by ID:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_FINDING_DISH_BY_ID, error);
             return null;
         }
     }
@@ -365,21 +366,21 @@ export class DishService {
                 .limit(limit)
                 .getMany();
         } catch (error) {
-            console.error('Error searching dishes:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_SEARCHING_DISHES, error);
             return [];
         }
     }
 
     async getRecentDishesForUser(username: string): Promise<Dish[]> {
         try {
-            const key = `recent_dishes:${username}`;
+            const key = `${ANGI_MESSAGES.REDIS_KEYS.RECENT_DISHES_PREFIX}${username}`;
             const recentDishes = await this.redisService.get(key);
             const dishIds = Array.isArray(recentDishes) ? recentDishes : [];
             return await this.dishRepository.findBy({
                 id: In(dishIds),
             });
         } catch (error) {
-            console.error('Error getting recent dishes for user:', error);
+            console.error(ANGI_MESSAGES.LOG.ERROR_GETTING_USER_RECENT_DISHES, error);
             return [];
         }
     }
