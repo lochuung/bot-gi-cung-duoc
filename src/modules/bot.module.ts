@@ -23,40 +23,46 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Dish } from '@app/entities/dish.entity';
 import { User } from '@app/entities/user.entity';
 import { TestCommand } from '@app/command/test.command';
+import { TourismService } from '@app/services/tourism.service';
+import { DidauCommand } from '@app/command/didau.command';
+import { Tourism } from '@app/entities/tourism.entity';
+import { DimodayCommand } from '@app/command/dimoday.command';
 
 @Module({
-    imports: [
-        ScheduleModule.forRoot(),
-        TypeOrmModule.forFeature([Dish, User]),
-    ],
-    providers: [
-        BotGateway,
-        ClientConfigService,
-        ConfigService,
-        CommandService,
-        MessageQueue,
-        MessageCommand,
-        DishService,
-        UserService,
-        RedisService,
+  imports: [
+    ScheduleModule.forRoot(),
+    TypeOrmModule.forFeature([Dish, User, Tourism]),
+  ],
+  providers: [
+    BotGateway,
+    ClientConfigService,
+    ConfigService,
+    CommandService,
+    MessageQueue,
+    MessageCommand,
+    DishService,
+    UserService,
+    RedisService,
+    TourismService,
+    // Command Services & Handlers
+    DishActionHandlers,
+    DishActionDispatcher,
 
-        // Command Services & Handlers
-        DishActionHandlers,
-        DishActionDispatcher,
+    // Listeners
+    EventListenerChannelMessage,
 
-        // Listeners
-        EventListenerChannelMessage,
-
-        // Commands
-        HelpCommand,
-        PingCommand,
-        AboutCommand,
-        AnGiCommand,
-        MenuCommand,
-        TestCommand,
-        DishAdminCommand,
-        UserStatsCommand
-    ],
-    controllers: [],
+    // Commands
+    HelpCommand,
+    PingCommand,
+    AboutCommand,
+    AnGiCommand,
+    MenuCommand,
+    TestCommand,
+    DishAdminCommand,
+    UserStatsCommand,
+    DidauCommand,
+    DimodayCommand,
+  ],
+  controllers: [],
 })
-export class BotModule { }
+export class BotModule {}
