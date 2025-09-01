@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { RedisService } from '@app/services/redis.service';
+import { GIDAY_MESSAGES } from '@app/command/constants/giday.messages';
+import { formatMessage } from '@app/command/utils/message-formatter.utils';
 
 export interface GiDayOption {
     value: string;
@@ -42,14 +44,16 @@ export class GiDayService {
         if (!option || option.trim().length === 0) {
             return {
                 isValid: false,
-                error: '❌ Lựa chọn không được để trống!'
+                error: GIDAY_MESSAGES.ERROR.EMPTY_OPTION
             };
         }
 
         if (option.length > this.MAX_OPTION_LENGTH) {
             return {
                 isValid: false,
-                error: `❌ Lựa chọn quá dài! Tối đa ${this.MAX_OPTION_LENGTH} ký tự.`
+                error: formatMessage(GIDAY_MESSAGES.ERROR.OPTION_TOO_LONG, { 
+                    maxLength: this.MAX_OPTION_LENGTH.toString() 
+                })
             };
         }
 
@@ -63,7 +67,9 @@ export class GiDayService {
         if (options.length < this.MIN_OPTIONS_FOR_RANDOM) {
             return {
                 isValid: false,
-                error: '❌ Cần ít nhất 2 lựa chọn để random!\n💡 Ví dụ: `!giday pizza, burger, phở`'
+                error: formatMessage(GIDAY_MESSAGES.ERROR.MIN_OPTIONS_DIRECT, { 
+                    minOptions: this.MIN_OPTIONS_FOR_RANDOM.toString() 
+                })
             };
         }
 
@@ -140,7 +146,7 @@ export class GiDayService {
             if (existingOptions.includes(option)) {
                 return { 
                     success: false, 
-                    error: `❌ Lựa chọn "${option}" đã tồn tại!\n📋 Dùng \`!giday list\` để xem danh sách hiện tại.`
+                    error: formatMessage(GIDAY_MESSAGES.ERROR.OPTION_EXISTS, { option })
                 };
             }
 
@@ -148,7 +154,9 @@ export class GiDayService {
             if (existingOptions.length >= this.MAX_OPTIONS) {
                 return { 
                     success: false, 
-                    error: `❌ Đã đạt giới hạn tối đa ${this.MAX_OPTIONS} lựa chọn!\n🧹 Dùng \`!giday clear\` để xóa hết và bắt đầu lại.`
+                    error: formatMessage(GIDAY_MESSAGES.ERROR.MAX_OPTIONS_REACHED, { 
+                        maxOptions: this.MAX_OPTIONS.toString() 
+                    })
                 };
             }
 
@@ -163,7 +171,7 @@ export class GiDayService {
             this.logger.error(`Failed to add option for user ${userId}:`, error);
             return { 
                 success: false, 
-                error: '❌ **Lỗi hệ thống!** Không thể lưu lựa chọn. Vui lòng thử lại.'
+                error: formatMessage(GIDAY_MESSAGES.ERROR.SYSTEM_ERROR, { action: 'lưu lựa chọn' })
             };
         }
     }
@@ -191,14 +199,16 @@ export class GiDayService {
             if (options.length === 0) {
                 return {
                     success: false,
-                    error: '❌ Chưa có lựa chọn nào!\n💡 Thêm lựa chọn với: `!giday add <option>`'
+                    error: GIDAY_MESSAGES.ERROR.NO_OPTIONS
                 };
             }
 
             if (options.length < this.MIN_OPTIONS_FOR_RANDOM) {
                 return {
                     success: false,
-                    error: '❌ Cần ít nhất 2 lựa chọn để random!\n💡 Thêm thêm với: `!giday add <option>`'
+                    error: formatMessage(GIDAY_MESSAGES.ERROR.MIN_OPTIONS_REQUIRED, { 
+                        minOptions: this.MIN_OPTIONS_FOR_RANDOM.toString() 
+                    })
                 };
             }
 
@@ -217,7 +227,7 @@ export class GiDayService {
             this.logger.error(`Failed to randomize options for user ${userId}:`, error);
             return {
                 success: false,
-                error: '❌ **Lỗi hệ thống!** Không thể thực hiện random. Vui lòng thử lại.'
+                error: formatMessage(GIDAY_MESSAGES.ERROR.SYSTEM_ERROR, { action: 'thực hiện random' })
             };
         }
     }
@@ -242,7 +252,7 @@ export class GiDayService {
             this.logger.error(`Failed to clear options for user ${userId}:`, error);
             return {
                 success: false,
-                error: '❌ **Lỗi hệ thống!** Không thể xóa danh sách. Vui lòng thử lại.'
+                error: formatMessage(GIDAY_MESSAGES.ERROR.SYSTEM_ERROR, { action: 'xóa danh sách' })
             };
         }
     }

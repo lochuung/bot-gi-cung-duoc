@@ -1,4 +1,5 @@
 import { DISH_ADMIN_CONSTANTS, DishField } from '@app/command/constants/dish-admin.constants';
+import { DISH_ADMIN_MESSAGES } from '@app/command/constants/dish-admin.messages';
 
 export class DishValidationUtils {
     /**
@@ -73,7 +74,7 @@ export class DishValidationUtils {
         if (args.length < 4) {
             return {
                 isValid: false,
-                error: 'Cần đủ 4 trường: tên món, tỉnh/thành, miền, phân loại'
+                error: DISH_ADMIN_MESSAGES.USAGE.ADD
             };
         }
 
@@ -82,7 +83,7 @@ export class DishValidationUtils {
         if (parsed.length < 4) {
             return {
                 isValid: false,
-                error: 'Cần đủ 4 trường: tên món, tỉnh/thành, miền, phân loại'
+                error: DISH_ADMIN_MESSAGES.USAGE.ADD
             };
         }
 
@@ -92,7 +93,7 @@ export class DishValidationUtils {
         if (!name.trim() || !province.trim() || !region.trim() || !category.trim()) {
             return {
                 isValid: false,
-                error: 'Tất cả các trường không được để trống'
+                error: `${DISH_ADMIN_MESSAGES.ERROR.MISSING_ARGS}\n\n${DISH_ADMIN_MESSAGES.USAGE.ADD}`
             };
         }
 

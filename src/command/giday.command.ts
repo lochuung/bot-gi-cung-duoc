@@ -2,6 +2,8 @@ import { ChannelMessage } from 'mezon-sdk';
 import { Command } from '@app/decorators/command.decorator';
 import { CommandMessage } from '@app/command/common/command.abstract';
 import { GiDayService, GiDayRandomResult } from '@app/services/giday.service';
+import { GIDAY_MESSAGES } from '@app/command/constants/giday.messages';
+import { formatMessage, joinMessages, createNumberedList } from '@app/command/utils/message-formatter.utils';
 
 @Command('giday', {
     description: 'Tạo danh sách lựa chọn và random một trong số đó',
@@ -72,7 +74,7 @@ export class GiDayCommand extends CommandMessage {
         if (optionArgs.length === 0) {
             return this.replyMessageGenerate(
                 {
-                    messageContent: '❌ Vui lòng cung cấp nội dung lựa chọn!\n💡 Ví dụ: `!giday add pizza`',
+                    messageContent: `❌ Vui lòng cung cấp nội dung lựa chọn!\n${GIDAY_MESSAGES.INFO.TIPS.ADD_MORE}`,
                     mk: true,
                 },
                 message,
@@ -97,12 +99,15 @@ export class GiDayCommand extends CommandMessage {
         lines.push('✅ **ĐÃ THÊM LỰA CHỌN**');
         lines.push('');
         lines.push(`➕ **Mới thêm:** ${option}`);
-        lines.push(`📊 **Tổng cộng:** ${result.newTotal}/${config.maxOptions} lựa chọn`);
+        lines.push(formatMessage(GIDAY_MESSAGES.INFO.OPTIONS_COUNT, { 
+            current: result.newTotal!.toString(),
+            max: config.maxOptions.toString()
+        }));
         lines.push('');
         lines.push('💡 **Tiếp theo:**');
-        lines.push('   • `!giday add <option>` - Thêm lựa chọn khác');
-        lines.push('   • `!giday done` - Random kết quả');
-        lines.push('   • `!giday list` - Xem danh sách');
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.ADD_MORE.replace('💡 ', '')}`);
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.RANDOM_NOW.replace('🎲 ', '')}`);
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.VIEW_LIST.replace('📋 ', '')}`);
 
         return this.replyMessageGenerate(
             {
@@ -154,7 +159,11 @@ export class GiDayCommand extends CommandMessage {
         if (listResult.totalOptions === 0) {
             return this.replyMessageGenerate(
                 {
-                    messageContent: '📋 **DANH SÁCH TRỐNG**\n\n💡 Thêm lựa chọn với: `!giday add <option>`',
+                    messageContent: joinMessages(
+                        GIDAY_MESSAGES.INFO.OPTIONS_LIST_EMPTY,
+                        '',
+                        GIDAY_MESSAGES.INFO.TIPS.ADD_MORE
+                    ),
                     mk: true,
                 },
                 message,
@@ -162,18 +171,21 @@ export class GiDayCommand extends CommandMessage {
         }
 
         const lines: string[] = [];
-        lines.push('📋 **DANH SÁCH LỰA CHỌN**');
+        lines.push(GIDAY_MESSAGES.INFO.OPTIONS_LIST_HEADER);
         lines.push('');
         listResult.options.forEach((option, index) => {
             lines.push(`   ${index + 1}. ${option}`);
         });
         lines.push('');
-        lines.push(`📊 **Tổng cộng:** ${listResult.totalOptions}/${listResult.maxOptions} lựa chọn`);
+        lines.push(formatMessage(GIDAY_MESSAGES.INFO.OPTIONS_COUNT, { 
+            current: listResult.totalOptions.toString(),
+            max: listResult.maxOptions.toString()
+        }));
         lines.push('');
         lines.push('💡 **Thao tác:**');
-        lines.push('   • `!giday add <option>` - Thêm lựa chọn');
-        lines.push('   • `!giday done` - Random kết quả');
-        lines.push('   • `!giday clear` - Xóa hết');
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.ADD_MORE.replace('💡 ', '')}`);
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.RANDOM_NOW.replace('🎲 ', '')}`);
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.CLEAR_ALL.replace('🧹 ', '')}`);
 
         return this.replyMessageGenerate(
             {
@@ -200,16 +212,24 @@ export class GiDayCommand extends CommandMessage {
         if (result.clearedCount === 0) {
             return this.replyMessageGenerate(
                 {
-                    messageContent: '💭 Danh sách đã trống rồi!',
+                    messageContent: GIDAY_MESSAGES.SUCCESS.NO_OPTIONS_TO_CLEAR,
                     mk: true,
                 },
                 message,
             );
         }
 
+        const successMessage = formatMessage(GIDAY_MESSAGES.SUCCESS.OPTIONS_CLEARED, { 
+            count: result.clearedCount!.toString() 
+        });
+
         return this.replyMessageGenerate(
             {
-                messageContent: `🧹 **ĐÃ XÓA HẾT**\n\n📊 Đã xóa ${result.clearedCount} lựa chọn\n💡 Bắt đầu thêm mới với: \`!giday add <option>\``,
+                messageContent: joinMessages(
+                    successMessage,
+                    '',
+                    GIDAY_MESSAGES.INFO.TIPS.ADD_MORE
+                ),
                 mk: true,
             },
             message,
@@ -222,16 +242,16 @@ export class GiDayCommand extends CommandMessage {
         lines.push('🎲 **HƯỚNG DẪN GIDAY**');
         lines.push('');
         lines.push('📝 **Cách 1: Random trực tiếp**');
-        lines.push('   `!giday pizza, burger, phở, cơm tấm`');
+        lines.push(`   ${GIDAY_MESSAGES.INFO.TIPS.DIRECT_MODE.replace('⚡ ', '')}`);
         lines.push('');
         lines.push('📝 **Cách 2: Tạo danh sách từ từ**');
-        lines.push('   `!giday add pizza` - Thêm lựa chọn');
+        lines.push(`   ${GIDAY_MESSAGES.INFO.TIPS.ADD_MORE.replace('💡 ', '')}`);
         lines.push('   `!giday add burger` - Thêm tiếp');
-        lines.push('   `!giday done` - Random kết quả');
+        lines.push(`   ${GIDAY_MESSAGES.INFO.TIPS.RANDOM_NOW.replace('🎲 ', '')}`);
         lines.push('');
         lines.push('🔧 **Lệnh khác:**');
-        lines.push('   • `!giday list` - Xem danh sách hiện tại');
-        lines.push('   • `!giday clear` - Xóa hết và bắt đầu lại');
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.VIEW_LIST.replace('📋 ', '')}`);
+        lines.push(`   • ${GIDAY_MESSAGES.INFO.TIPS.CLEAR_ALL.replace('🧹 ', '')}`);
         lines.push('');
         lines.push(`⚠️ **Giới hạn:** Tối đa ${config.maxOptions} lựa chọn, tự động xóa sau 24h`);
 

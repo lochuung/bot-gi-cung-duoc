@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DishActionHandlers, ActionHandlerResponse } from '@app/command/handlers/dish-action.handlers';
+import { DISH_ADMIN_MESSAGES } from '@app/command/constants/dish-admin.messages';
 
 export type DishActionType = 
     | 'add'
@@ -45,7 +46,7 @@ export class DishActionDispatcher {
         } catch (error) {
             console.error(`Error executing dish action "${action}":`, error);
             return {
-                messageContent: '❌ **Đã xảy ra lỗi!** Vui lòng thử lại.',
+                messageContent: DISH_ADMIN_MESSAGES.ERROR.GENERIC,
                 mk: true
             };
         }
