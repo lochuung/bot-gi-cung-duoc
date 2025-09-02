@@ -4,6 +4,7 @@ export { GIDAY_MESSAGES } from './giday.messages';
 export { ANGI_MESSAGES } from './angi.messages';
 export { MENU_MESSAGES } from './menu.messages';
 export { USER_STATS_MESSAGES } from './user-stats.messages';
+export { DIDAUDAY_MESSAGES } from './didauday.messages';
 
 // You can also export them with different names if needed
 export {
@@ -25,6 +26,10 @@ export {
 export {
     USER_STATS_MESSAGES as UserStatsMessages,
 } from './user-stats.messages';
+
+export {
+    DIDAUDAY_MESSAGES as DidauDayMessages,
+} from './didauday.messages';
 
 // Export utility functions
 export * from '../utils/message-formatter.utils';

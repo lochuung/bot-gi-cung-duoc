@@ -2,6 +2,8 @@ import { Command } from '@app/decorators/command.decorator';
 import { CommandMessage } from './common/command.abstract';
 import { TourismService } from '@app/services/tourism.service';
 import { ChannelMessage } from 'mezon-sdk';
+import { DIDAUDAY_MESSAGES } from '@app/messages/didauday.messages';
+import { formatMessage } from '@app/utils/message-formatter.utils';
 
 @Command('didauday', {
   description:
@@ -24,17 +26,25 @@ export class DidaudayCommand extends CommandMessage {
     );
 
     if (!result.picked) {
-      let errorMessage = '😔 Không tìm thấy địa điểm nào';
-
+      let errorMessage: string;
+      
       if (filters.region || filters.province) {
-        errorMessage += ' với điều kiện:';
-        if (filters.region) errorMessage += `\n🗺️ Miền: ${filters.region}`;
-        if (filters.province)
-          errorMessage += `\n🏞️ Tỉnh/Thành phố: ${filters.province}`;
+        errorMessage = DIDAUDAY_MESSAGES.ERROR.NO_PLACES_WITH_FILTERS;
+        if (filters.region) {
+          errorMessage += '\n' + formatMessage(DIDAUDAY_MESSAGES.INFO.FILTER_DISPLAY.REGION, {
+            value: filters.region
+          });
+        }
+        if (filters.province) {
+          errorMessage += '\n' + formatMessage(DIDAUDAY_MESSAGES.INFO.FILTER_DISPLAY.PROVINCE, {
+            value: filters.province
+          });
+        }
+      } else {
+        errorMessage = DIDAUDAY_MESSAGES.ERROR.NO_PLACES_FOUND;
       }
-
-      errorMessage +=
-        '\n\n💡 Thử lại với: `!didauday` (ngẫu nhiên) hoặc `!didauday miền bắc`';
+      
+      errorMessage += `\n\n${DIDAUDAY_MESSAGES.INFO.TIPS.TRY_AGAIN}`;
 
       return this.replyMessageGenerate(
         {
@@ -47,33 +57,57 @@ export class DidaudayCommand extends CommandMessage {
 
     const lines: string[] = [];
 
-    lines.push(`🌍 **Gợi ý hôm nay: ${result.picked.address}**`);
-    lines.push(`🏞️ Tỉnh/Thành phố: ${result.picked.province}`);
-    lines.push(`🗺️ Miền: ${result.picked.region}`);
+    // Main suggestion
+    lines.push(formatMessage(DIDAUDAY_MESSAGES.INFO.PLACE_DETAILS.SUGGESTION, {
+      address: result.picked.address
+    }));
+    lines.push(formatMessage(DIDAUDAY_MESSAGES.INFO.PLACE_DETAIL_ITEM, {
+      label: DIDAUDAY_MESSAGES.INFO.PLACE_DETAILS.PROVINCE,
+      value: result.picked.province
+    }));
+    lines.push(formatMessage(DIDAUDAY_MESSAGES.INFO.PLACE_DETAIL_ITEM, {
+      label: DIDAUDAY_MESSAGES.INFO.PLACE_DETAILS.REGION,
+      value: result.picked.region
+    }));
 
+    // Filter info
     if (filters.region || filters.province) {
       lines.push('');
-      lines.push('🎯 **Tiêu chí tìm kiếm:**');
-      if (filters.region) lines.push(`   • Miền: ${filters.region}`);
-      if (filters.province)
-        lines.push(`   • Tỉnh/Thành phố: ${filters.province}`);
+      lines.push(DIDAUDAY_MESSAGES.INFO.FILTER_INFO);
+      if (filters.region) {
+        lines.push(formatMessage(DIDAUDAY_MESSAGES.INFO.FILTER_ITEM, {
+          label: DIDAUDAY_MESSAGES.INFO.FILTER_LABELS.REGION,
+          value: filters.region
+        }));
+      }
+      if (filters.province) {
+        lines.push(formatMessage(DIDAUDAY_MESSAGES.INFO.FILTER_ITEM, {
+          label: DIDAUDAY_MESSAGES.INFO.FILTER_LABELS.PROVINCE,
+          value: filters.province
+        }));
+      }
     }
 
+    // Statistics
     lines.push('');
-    lines.push(`📊 Tổng số địa điểm thỏa mãn: **${result.total}** nơi`);
+    lines.push(formatMessage(DIDAUDAY_MESSAGES.INFO.STATISTICS, { total: result.total.toString() }));
 
+    // Additional suggestions
     if (result.suggestions.length > 0) {
       lines.push('');
-      lines.push('💡 **Gợi ý khác:**');
+      lines.push(DIDAUDAY_MESSAGES.INFO.OTHER_SUGGESTIONS);
       result.suggestions.forEach((place, index) => {
-        lines.push(`   ${index + 1}. ${place.address} (${place.province})`);
+        lines.push(formatMessage(DIDAUDAY_MESSAGES.INFO.SUGGESTION_ITEM, {
+          index: (index + 1).toString(),
+          address: place.address,
+          province: place.province
+        }));
       });
     }
 
+    // Usage tip
     lines.push('');
-    lines.push(
-      '💬 *Gõ `!didauday` để random toàn quốc hoặc `!didauday quảng ninh` để lọc theo tỉnh hoặc thành phố*',
-    );
+    lines.push(DIDAUDAY_MESSAGES.INFO.TIPS.USAGE);
 
     return this.replyMessageGenerate(
       {
