@@ -2,7 +2,7 @@ import { ChannelMessage } from 'mezon-sdk';
 import { Command } from '@app/decorators/command.decorator';
 import { CommandMessage } from '@app/command/common/command.abstract';
 import { IsAdmin } from '@app/decorators/admin.decorator';
-import { DishActionDispatcher } from '@app/command/services/dish-action-dispatcher.service';
+import { DishActionDispatcher } from '@app/services/dish-action-dispatcher.service';
 
 @Command('dish', {
     description: 'Quản lý món ăn (chỉ dành cho admin)',

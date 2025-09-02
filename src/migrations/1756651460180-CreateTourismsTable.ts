@@ -22,13 +22,13 @@ export class CreateTourismsTable1756651460180 implements MigrationInterface {
           {
             name: 'province',
             type: 'varchar',
-            length: '100',
+            length: '255',
             isNullable: false,
           },
           {
             name: 'region',
             type: 'varchar',
-            length: '100',
+            length: '255',
             isNullable: false,
           },
           {

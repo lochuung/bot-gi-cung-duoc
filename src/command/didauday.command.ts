@@ -3,15 +3,15 @@ import { CommandMessage } from './common/command.abstract';
 import { TourismService } from '@app/services/tourism.service';
 import { ChannelMessage } from 'mezon-sdk';
 
-@Command('dimoday', {
+@Command('didauday', {
   description:
     'Gợi ý địa điểm du lịch ngẫu nhiên (có thể lọc theo miền hoặc tỉnh/thành phố trực thuộc TW)',
   usage:
-    '!dimoday [miền|tỉnh]\nVí dụ: !dimoday miền bắc\n!dimoday quảng ninh\n!dimoday cần thơ',
+    '!didauday [miền|tỉnh]\nVí dụ: !didauday miền bắc\n!didauday quảng ninh\n!didauday cần thơ',
   category: 'Tourism',
   aliases: ['di', 'tour', 'travel'],
 })
-export class DimodayCommand extends CommandMessage {
+export class DidaudayCommand extends CommandMessage {
   constructor(private readonly tourismService: TourismService) {
     super();
   }
@@ -34,7 +34,7 @@ export class DimodayCommand extends CommandMessage {
       }
 
       errorMessage +=
-        '\n\n💡 Thử lại với: `!dimoday` (ngẫu nhiên) hoặc `!dimoday miền bắc`';
+        '\n\n💡 Thử lại với: `!didauday` (ngẫu nhiên) hoặc `!didauday miền bắc`';
 
       return this.replyMessageGenerate(
         {
@@ -72,7 +72,7 @@ export class DimodayCommand extends CommandMessage {
 
     lines.push('');
     lines.push(
-      '💬 *Gõ `!dimoday` để random toàn quốc hoặc `!dimoday quảng ninh` để lọc theo tỉnh hoặc thành phố*',
+      '💬 *Gõ `!didauday` để random toàn quốc hoặc `!didauday quảng ninh` để lọc theo tỉnh hoặc thành phố*',
     );
 
     return this.replyMessageGenerate(

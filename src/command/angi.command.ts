@@ -2,6 +2,8 @@ import { ChannelMessage } from 'mezon-sdk';
 import { Command } from '@app/decorators/command.decorator';
 import { CommandMessage } from '@app/command/common/command.abstract';
 import { DishService } from '@app/services/dish.service';
+import { ANGI_MESSAGES } from '@app/messages/angi.messages';
+import { formatMessage, joinMessages } from '@app/utils/message-formatter.utils';
 
 @Command('angi', {
     description: 'Gợi ý món ăn ngẫu nhiên (có thể lọc theo miền và phân loại)',
@@ -19,15 +21,27 @@ export class AnGiCommand extends CommandMessage {
         const result = await this.dishService.findRandomDish(filters, message.username);
 
         if (!result.picked) {
-            let errorMessage = '😔 Không tìm thấy món ăn nào';
+            let errorMessage: string;
             
             if (filters.region || filters.category) {
-                errorMessage += ' với điều kiện:';
-                if (filters.region) errorMessage += `\n🗺️ Miền: ${filters.region}`;
-                if (filters.category) errorMessage += `\n🍽️ Phân loại: ${filters.category}`;
+                errorMessage = ANGI_MESSAGES.ERROR.NO_DISHES_WITH_FILTERS;
+                if (filters.region) {
+                    errorMessage += '\n' + formatMessage(ANGI_MESSAGES.INFO.FILTER_DISPLAY.REGION, {
+                        label: ANGI_MESSAGES.INFO.FILTER_LABELS.REGION,
+                        value: filters.region
+                    });
+                }
+                if (filters.category) {
+                    errorMessage += '\n' + formatMessage(ANGI_MESSAGES.INFO.FILTER_DISPLAY.CATEGORY, {
+                        label: ANGI_MESSAGES.INFO.FILTER_LABELS.CATEGORY,
+                        value: filters.category
+                    });
+                }
+            } else {
+                errorMessage = ANGI_MESSAGES.ERROR.NO_DISHES_FOUND;
             }
             
-            errorMessage += '\n\n💡 Thử lại với: `!angi` (ngẫu nhiên) hoặc `!angi miền nam`';
+            errorMessage += `\n\n${ANGI_MESSAGES.INFO.TIPS.TRY_AGAIN}`;
 
             return this.replyMessageGenerate(
                 {
@@ -41,35 +55,61 @@ export class AnGiCommand extends CommandMessage {
         const lines: string[] = [];
         
         // Main suggestion
-        lines.push(`🍽️ **Gợi ý hôm nay: ${result.picked.name}**`);
-        lines.push(`🏙️ Tỉnh/Thành: ${result.picked.province}`);
-        lines.push(`🗺️ Miền: ${result.picked.region}`);
-        lines.push(`📋 Phân loại: ${result.picked.category}`);
+        lines.push(formatMessage(ANGI_MESSAGES.INFO.DISH_DETAIL_ITEM, {
+            label: ANGI_MESSAGES.INFO.DISH_DETAILS.NAME,
+            value: `${result.picked.name}`
+        }));
+        lines.push(formatMessage(ANGI_MESSAGES.INFO.DISH_DETAIL_ITEM, {
+            label: ANGI_MESSAGES.INFO.DISH_DETAILS.PROVINCE,
+            value: result.picked.province
+        }));
+        lines.push(formatMessage(ANGI_MESSAGES.INFO.DISH_DETAIL_ITEM, {
+            label: ANGI_MESSAGES.INFO.DISH_DETAILS.REGION,
+            value: result.picked.region
+        }));
+        lines.push(formatMessage(ANGI_MESSAGES.INFO.DISH_DETAIL_ITEM, {
+            label: ANGI_MESSAGES.INFO.DISH_DETAILS.CATEGORY,
+            value: result.picked.category
+        }));
         
         // Filter info
         if (filters.region || filters.category) {
             lines.push('');
-            lines.push('🎯 **Tiêu chí tìm kiếm:**');
-            if (filters.region) lines.push(`   • Miền: ${filters.region}`);
-            if (filters.category) lines.push(`   • Phân loại: ${filters.category}`);
+            lines.push(ANGI_MESSAGES.INFO.FILTER_INFO);
+            if (filters.region) {
+                lines.push(formatMessage(ANGI_MESSAGES.INFO.FILTER_ITEM, {
+                    label: ANGI_MESSAGES.INFO.FILTER_LABELS.REGION,
+                    value: filters.region
+                }));
+            }
+            if (filters.category) {
+                lines.push(formatMessage(ANGI_MESSAGES.INFO.FILTER_ITEM, {
+                    label: ANGI_MESSAGES.INFO.FILTER_LABELS.CATEGORY,
+                    value: filters.category
+                }));
+            }
         }
         
         // Statistics
         lines.push('');
-        lines.push(`📊 Tổng số món thỏa mãn: **${result.total}** món`);
+        lines.push(formatMessage(ANGI_MESSAGES.INFO.STATISTICS, { total: result.total.toString() }));
 
         // Additional suggestions
         if (result.suggestions.length > 0) {
             lines.push('');
-            lines.push('💡 **Gợi ý khác:**');
+            lines.push(ANGI_MESSAGES.INFO.OTHER_SUGGESTIONS);
             result.suggestions.forEach((dish, index) => {
-                lines.push(`   ${index + 1}. ${dish.name} (${dish.province})`);
+                lines.push(formatMessage(ANGI_MESSAGES.INFO.SUGGESTION_ITEM, {
+                    index: (index + 1).toString(),
+                    name: dish.name,
+                    province: dish.province
+                }));
             });
         }
 
         // Usage tip
         lines.push('');
-        lines.push('💬 *Gõ `!angi` để random toàn bộ hoặc `!angi miền bắc` để lọc theo miền*');
+        lines.push(ANGI_MESSAGES.INFO.TIPS.USAGE);
 
         return this.replyMessageGenerate(
             {

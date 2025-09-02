@@ -5,6 +5,7 @@ import { AnGiCommand } from '@app/command/angi.command';
 import { MenuCommand } from '@app/command/menu.command';
 import { DishAdminCommand } from '@app/command/dish-admin.command';
 import { UserStatsCommand } from '@app/command/user-stats.command';
+import { GiDayCommand } from '@app/command/giday.command';
 import { ClientConfigService } from '@app/config/client.config';
 import { BotGateway } from '@app/gateway/bot.gateway';
 import { EventListenerChannelMessage } from '@app/listeners';
@@ -14,8 +15,9 @@ import { MessageQueue } from '@app/services/message-queue.service';
 import { DishService } from '@app/services/dish.service';
 import { UserService } from '@app/services/user.service';
 import { RedisService } from '@app/services/redis.service';
-import { DishActionHandlers } from '@app/command/handlers/dish-action.handlers';
-import { DishActionDispatcher } from '@app/command/services/dish-action-dispatcher.service';
+import { GiDayService } from '@app/services/giday.service';
+import { DishActionHandlers } from '@app/handlers/dish-action.handlers';
+import { DishActionDispatcher } from '@app/services/dish-action-dispatcher.service';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -26,7 +28,7 @@ import { TestCommand } from '@app/command/test.command';
 import { TourismService } from '@app/services/tourism.service';
 import { DidauCommand } from '@app/command/didau.command';
 import { Tourism } from '@app/entities/tourism.entity';
-import { DimodayCommand } from '@app/command/dimoday.command';
+import { DidaudayCommand } from '@app/command/didauday.command';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { DimodayCommand } from '@app/command/dimoday.command';
     UserService,
     RedisService,
     TourismService,
+    GiDayService,
+
     // Command Services & Handlers
     DishActionHandlers,
     DishActionDispatcher,
@@ -60,8 +64,9 @@ import { DimodayCommand } from '@app/command/dimoday.command';
     TestCommand,
     DishAdminCommand,
     UserStatsCommand,
+    GiDayCommand,
     DidauCommand,
-    DimodayCommand,
+    DidaudayCommand,
   ],
   controllers: [],
 })
