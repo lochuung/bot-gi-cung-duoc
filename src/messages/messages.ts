@@ -4,7 +4,7 @@ export { GIDAY_MESSAGES } from './giday.messages';
 export { ANGI_MESSAGES } from './angi.messages';
 export { MENU_MESSAGES } from './menu.messages';
 export { USER_STATS_MESSAGES } from './user-stats.messages';
-export { DIDAUDAY_MESSAGES } from './didauday.messages';
+export { DIDAUCUNGDUOC_MESSAGES } from './didaucungduoc.messages';
 
 // You can also export them with different names if needed
 export {
@@ -28,8 +28,8 @@ export {
 } from './user-stats.messages';
 
 export {
-    DIDAUDAY_MESSAGES as DidauDayMessages,
-} from './didauday.messages';
+    DIDAUCUNGDUOC_MESSAGES as DiDauCungDuocMessages,
+} from './didaucungduoc.messages';
 
 // Export utility functions
 export * from '../utils/message-formatter.utils';

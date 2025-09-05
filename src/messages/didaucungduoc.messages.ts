@@ -1,4 +1,4 @@
-export const DIDAUDAY_MESSAGES = {
+export const DIDAUCUNGDUOC_MESSAGES = {
     ERROR: {
         NO_PLACES_FOUND: '😔 Không tìm thấy địa điểm nào',
         NO_PLACES_WITH_FILTERS: '😔 Không tìm thấy địa điểm nào với điều kiện:',
@@ -28,8 +28,8 @@ export const DIDAUDAY_MESSAGES = {
         PLACE_DETAIL_ITEM: '{label} {value}',
         SUGGESTION_ITEM: '   {index}. {address} ({province})',
         TIPS: {
-            USAGE: '💬 *Gõ `!didauday` để random toàn quốc hoặc `!didauday quảng ninh` để lọc theo tỉnh hoặc thành phố*',
-            TRY_AGAIN: '💡 Thử lại với: `!didauday` (ngẫu nhiên) hoặc `!didauday miền bắc`',
+            USAGE: '💬 *Gõ `!didaucungduoc` để random toàn quốc hoặc `!didaucungduoc quảng ninh` để lọc theo tỉnh hoặc thành phố*',
+            TRY_AGAIN: '💡 Thử lại với: `!didaucungduoc` (ngẫu nhiên) hoặc `!didaucungduoc miền bắc`',
         },
     },
     LOG: {

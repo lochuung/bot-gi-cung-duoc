@@ -2,7 +2,7 @@ import * as path from 'path';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import * as fs from 'fs';
 
-export class ImportTourismFromCsv1756650298107 implements MigrationInterface {
+export class ImportTourismFromCsv1756652686112 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const csvPath = path.join(__dirname, '../../data/tourism.csv');
     let csvContent: string;

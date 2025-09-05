@@ -1,7 +1,7 @@
 import { HelpCommand } from '@app/command/help.command';
 import { PingCommand } from '@app/command/ping.command';
 import { AboutCommand } from '@app/command/about.command';
-import { AnGiCommand } from '@app/command/angi.command';
+import { AnGiCungDuocCommand } from '@app/command/angicungduoc.command';
 import { MenuCommand } from '@app/command/menu.command';
 import { DishAdminCommand } from '@app/command/dish-admin.command';
 import { UserStatsCommand } from '@app/command/user-stats.command';
@@ -28,7 +28,8 @@ import { TestCommand } from '@app/command/test.command';
 import { TourismService } from '@app/services/tourism.service';
 import { DidauCommand } from '@app/command/didau.command';
 import { Tourism } from '@app/entities/tourism.entity';
-import { DidaudayCommand } from '@app/command/didauday.command';
+import { DiDauCungDuocCommand } from '@app/command/didaucungduoc.command';
+import { MemegicungduocCommand } from '@app/command/memegicungduoc.command';
 
 @Module({
   imports: [
@@ -59,14 +60,15 @@ import { DidaudayCommand } from '@app/command/didauday.command';
     HelpCommand,
     PingCommand,
     AboutCommand,
-    AnGiCommand,
+    AnGiCungDuocCommand,
     MenuCommand,
     TestCommand,
     DishAdminCommand,
     UserStatsCommand,
     GiDayCommand,
     DidauCommand,
-    DidaudayCommand,
+    DiDauCungDuocCommand,
+    MemegicungduocCommand,
   ],
   controllers: [],
 })

@@ -5,13 +5,13 @@ import { DishService } from '@app/services/dish.service';
 import { ANGI_MESSAGES } from '@app/messages/angi.messages';
 import { formatMessage, joinMessages } from '@app/utils/message-formatter.utils';
 
-@Command('angi', {
+@Command('angicungduoc', {
     description: 'Gợi ý món ăn ngẫu nhiên (có thể lọc theo miền và phân loại)',
-    usage: '!angi [miền] [phân loại]\nVí dụ: !angi miền nam món chính',
+    usage: '!angicungduoc [miền] [phân loại]\nVí dụ: !angicungduoc miền nam món chính',
     category: 'Food',
-    aliases: ['an', 'goimon', 'eat'],
+    aliases: ['angi', 'goimon', 'eat'],
 })
-export class AnGiCommand extends CommandMessage {
+export class AnGiCungDuocCommand extends CommandMessage {
     constructor(private readonly dishService: DishService) {
         super();
     }

@@ -30,10 +30,10 @@ export class DidauCommand extends CommandMessage {
 
     lines.push('');
     lines.push('💡 **Cách sử dụng:**');
-    lines.push('   • `!didauday` - Gợi ý ngẫu nhiên');
-    lines.push('   • `!didauday miền nam` - Lọc theo miền');
-    lines.push('   • `!didauday hà nội` - Lọc theo tỉnh/thành');
-    lines.push('   • `!didauday miền bắc hà nội` - Lọc kết hợp');
+    lines.push('   • `!didaucungduoc` - Gợi ý ngẫu nhiên');
+    lines.push('   • `!didaucungduoc miền nam` - Lọc theo miền');
+    lines.push('   • `!didaucungduoc hà nội` - Lọc theo tỉnh/thành');
+    lines.push('   • `!didaucungduoc miền bắc hà nội` - Lọc kết hợp');
 
     lines.push('');
     lines.push('🎯 **Aliases:** `!di`, `!dulich`, `!choi`');
