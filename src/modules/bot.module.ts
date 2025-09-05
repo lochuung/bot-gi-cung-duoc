@@ -30,6 +30,7 @@ import { DidauCommand } from '@app/command/didau.command';
 import { Tourism } from '@app/entities/tourism.entity';
 import { DiDauCungDuocCommand } from '@app/command/didaucungduoc.command';
 import { MemegicungduocCommand } from '@app/command/memegicungduoc.command';
+import { GifGicungduocCommand } from '@app/command/gifgicungduoc.command';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { MemegicungduocCommand } from '@app/command/memegicungduoc.command';
     DidauCommand,
     DiDauCungDuocCommand,
     MemegicungduocCommand,
+    GifGicungduocCommand,
   ],
   controllers: [],
 })
